@@ -1,6 +1,3 @@
-go mod init go-labs
-go run main.go
-cat > main.go << 'EOF'
 package main
 
 import "fmt"
@@ -96,4 +93,3 @@ func main() {
     showStruct()
     showInterface()
 }
-EOF
