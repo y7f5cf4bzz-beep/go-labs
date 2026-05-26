@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Вход в систему</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/public/css/login.css">
+</head>
+<body>
+    <div class="login-page">
+        {{if .LoginError}}<p style="color:red">Неверное имя пользователя или пароль!</p>{{end}}
+        <form method="post" id="formlogin" class="form" action="/">
+            {{if .Username}}
+                <p><b>{{.Username}}</b>, вы уже вошли! <a href="/logout">Выйти</a></p>
+            {{else}}
+                <input type="text" name="Username" placeholder="Логин"><br>
+                <input type="password" name="Password" placeholder="Пароль">
+                <input type="hidden" name="Login" value="Let me in!"><br>
+                <button type="button" onclick="document.getElementById('formlogin').submit();">Войти</button>
+            {{end}}
+        </form>
+    </div>
+</body>
+</html>
