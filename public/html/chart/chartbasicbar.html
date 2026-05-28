@@ -1,0 +1,69 @@
+<script src="/node_modules/echarts/dist/echarts.min.js"></script>
+<script>
+function ChartBasicBar(sActivityType) {
+    $('#dwait').dialog('open');
+    var formData = new FormData();
+    formData.append("studentid", document.getElementById('floatstudentid').value);
+    formData.append("activitytype", sActivityType);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/chartbasicbar");
+    xhr.onload = function(e) {
+        if(this.readyState == 4 && this.status == 200) {
+            var response = this.response;
+            // Проверяем, не перенаправление ли это на страницу входа
+            if(response.indexOf("login-page") !== -1 || response.indexOf("Регистрация") !== -1) {
+                window.location.href = "/logout";
+                return;
+            }
+            try {
+                var data = JSON.parse(response);
+                var categories = [];
+                var values = [];
+                for (var key in data) {
+                    categories.push(key.replace(/ /g, '\n'));
+                    values.push(data[key]);
+                }
+                var chartDom = document.getElementById('chart1');
+                var myChart = echarts.init(chartDom);
+                var option = {
+                    title: { text: 'Научная активность студентов' },
+                    xAxis: { type: 'category', data: categories, axisLabel: { rotate: 45, interval: 0 } },
+                    yAxis: { type: 'value', name: 'Количество баллов' },
+                    series: [{ data: values, type: 'bar', itemStyle: { color: '#4CAF50' } }],
+                    tooltip: { trigger: 'axis' }
+                };
+                myChart.setOption(option);
+            } catch(e) {
+                $('#reportResult').html('<p class="text-danger">Ошибка загрузки данных: ' + e.message + '</p>');
+            }
+            $('#dwait').dialog('close');
+        }
+    };
+    xhr.send(formData);
+}
+
+$(document).ready(function() {
+    // Автоматически загружаем график при загрузке страницы
+    ChartBasicBar('');
+});
+</script>
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label>Тип активности:</label>
+            <select id="activitytype" class="form-control" onchange="ChartBasicBar(this.value);">
+                <option value="">Все активности</option>
+                <option value="1">Конференции</option>
+                <option value="2">Проекты</option>
+                <option value="3">Статьи</option>
+            </select>
+        </div>
+        <div class="col-md-8">
+            <button class="btn btn-primary mt-4" onclick="ChartBasicBar($('#activitytype').val());">Построить график</button>
+        </div>
+    </div>
+    <div id="chart1" style="width:100%; height:500px; margin-top:20px;"></div>
+    <div id="reportResult" style="margin-top:20px;"></div>
+</div>

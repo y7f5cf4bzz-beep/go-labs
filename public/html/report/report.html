@@ -1,0 +1,62 @@
+<script>
+function SearchReport(format) {
+    $('#dwait').dialog('open');
+    var formData = new FormData();
+    formData.append("format", format);
+    formData.append("studentid", document.getElementById('floatstudentid').value);
+    formData.append("confname", document.getElementById('confname').value);
+    formData.append("projectname", document.getElementById('projectname').value);
+    formData.append("papername", document.getElementById('papername').value);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/searchreport");
+    xhr.onload = function(e) {
+        if(this.readyState == 4 && this.status == 200) {
+            var response = this.response;
+            // Проверяем, не перенаправление ли это на страницу входа
+            if(response.indexOf("login-page") !== -1 || response.indexOf("Регистрация") !== -1) {
+                window.location.href = "/logout";
+                return;
+            }
+            $('#reportResult').html(response);
+            $('#dwait').dialog('close');
+        }
+    };
+    xhr.send(formData);
+}
+
+function SearchReportXLSXDOCX(format) {
+    var url = '/searchreport?format=' + format + 
+              '&studentid=' + encodeURIComponent(document.getElementById('floatstudentid').value) +
+              '&confname=' + encodeURIComponent(document.getElementById('confname').value) +
+              '&projectname=' + encodeURIComponent(document.getElementById('projectname').value) +
+              '&papername=' + encodeURIComponent(document.getElementById('papername').value);
+    window.location.href = url;
+}
+</script>
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" id="confname" class="form-control" placeholder="Название конференции">
+        </div>
+        <div class="col-md-4">
+            <input type="text" id="projectname" class="form-control" placeholder="Название проекта">
+        </div>
+        <div class="col-md-4">
+            <input type="text" id="papername" class="form-control" placeholder="Название статьи">
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <button class="btn btn-primary" onclick="SearchReport('HTML');">HTML отчет</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-success" onclick="SearchReportXLSXDOCX('XLSX');">XLSX отчет</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-info" onclick="SearchReportXLSXDOCX('DOCX');">DOCX отчет</button>
+        </div>
+    </div>
+    <div id="reportResult" style="margin-top:20px;"></div>
+</div>
